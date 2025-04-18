@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Post</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>Create a Post</h1>
-  <textarea id="postContent" placeholder="Write your post..." rows="5" cols="40"></textarea><br><br>
-  <button onclick="createPost()">Share</button>
-  <p id="shareLink"></p>
+<body class="bg-gray-100 font-sans text-gray-800 flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-xl rounded-lg p-8 w-96">
+    <h1 class="text-3xl font-bold text-center mb-6">Create a Post</h1>
+    <textarea id="postContent" placeholder="Write your post..." class="w-full p-4 bg-gray-200 rounded-md border-2 border-gray-300 mb-4" rows="5"></textarea>
+    <button onclick="createPost()" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+      Share Post
+    </button>
+    <p id="shareLink" class="mt-4 text-center text-blue-500 font-medium"></p>
+  </div>
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -33,10 +40,10 @@
 
       db.collection("posts").add({ content, createdAt: new Date() })
         .then((docRef) => {
-          const link = `${location.origin}/post.html?id=${docRef.id}`;
+          const link = `${location.origin}/share-post-app/post.html?id=${docRef.id}`;
           document.getElementById("shareLink").innerHTML = `
             Share this link:<br>
-            <a href="${link}" target="_blank">${link}</a>
+            <a href="${link}" target="_blank" class="text-blue-600 hover:underline">${link}</a>
           `;
         })
         .catch((error) => {
