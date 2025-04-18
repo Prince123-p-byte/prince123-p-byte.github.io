@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>View Post</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+  <title>Create Post</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 font-sans text-gray-800 flex items-center justify-center min-h-screen">
-  <div class="bg-white shadow-xl rounded-lg p-8 w-96">
-    <h1 class="text-3xl font-bold text-center mb-6">Post</h1>
-    <p id="postContent" class="text-lg text-center text-gray-700">Loading post...</p>
+<body>
+  <div class="container">
+    <div class="form-container">
+      <h1>Create a Post</h1>
+      <textarea id="postContent" placeholder="Write your post..." rows="5"></textarea>
+      <button onclick="createPost()">Share Post</button>
+      <p id="shareLink" class="share-link"></p>
+    </div>
   </div>
 
   <!-- Firebase SDKs -->
@@ -30,21 +34,21 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("id");
+    function createPost() {
+      const content = document.getElementById("postContent").value;
+      if (!content.trim()) return alert("Post cannot be empty!");
 
-    if (!id) {
-      document.getElementById("postContent").innerText = "No post ID provided!";
-    } else {
-      db.collection("posts").doc(id).get().then((doc) => {
-        if (doc.exists) {
-          document.getElementById("postContent").innerText = doc.data().content;
-        } else {
-          document.getElementById("postContent").innerText = "Post not found.";
-        }
-      }).catch((error) => {
-        document.getElementById("postContent").innerText = "Error fetching post.";
-      });
+      db.collection("posts").add({ content, createdAt: new Date() })
+        .then((docRef) => {
+          const link = `${location.origin}/share-post-app/post.html?id=${docRef.id}`;
+          document.getElementById("shareLink").innerHTML = `
+            Share this link:<br>
+            <a href="${link}" target="_blank">${link}</a>
+          `;
+        })
+        .catch((error) => {
+          alert("Error creating post: " + error.message);
+        });
     }
   </script>
 </body>
