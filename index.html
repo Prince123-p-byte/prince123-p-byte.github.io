@@ -3,17 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create Post</title>
+  <title>View Post</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 font-sans text-gray-800 flex items-center justify-center min-h-screen">
+<body class="bg-gray-50 font-sans text-gray-800 flex items-center justify-center min-h-screen">
   <div class="bg-white shadow-xl rounded-lg p-8 w-96">
-    <h1 class="text-3xl font-bold text-center mb-6">Create a Post</h1>
-    <textarea id="postContent" placeholder="Write your post..." class="w-full p-4 bg-gray-200 rounded-md border-2 border-gray-300 mb-4" rows="5"></textarea>
-    <button onclick="createPost()" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
-      Share Post
-    </button>
-    <p id="shareLink" class="mt-4 text-center text-blue-500 font-medium"></p>
+    <h1 class="text-3xl font-bold text-center mb-6">Post</h1>
+    <p id="postContent" class="text-lg text-center text-gray-700">Loading post...</p>
   </div>
 
   <!-- Firebase SDKs -->
@@ -34,21 +30,21 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    function createPost() {
-      const content = document.getElementById("postContent").value;
-      if (!content.trim()) return alert("Post cannot be empty!");
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
-      db.collection("posts").add({ content, createdAt: new Date() })
-        .then((docRef) => {
-          const link = `${location.origin}/share-post-app/post.html?id=${docRef.id}`;
-          document.getElementById("shareLink").innerHTML = `
-            Share this link:<br>
-            <a href="${link}" target="_blank" class="text-blue-600 hover:underline">${link}</a>
-          `;
-        })
-        .catch((error) => {
-          alert("Error creating post: " + error.message);
-        });
+    if (!id) {
+      document.getElementById("postContent").innerText = "No post ID provided!";
+    } else {
+      db.collection("posts").doc(id).get().then((doc) => {
+        if (doc.exists) {
+          document.getElementById("postContent").innerText = doc.data().content;
+        } else {
+          document.getElementById("postContent").innerText = "Post not found.";
+        }
+      }).catch((error) => {
+        document.getElementById("postContent").innerText = "Error fetching post.";
+      });
     }
   </script>
 </body>
