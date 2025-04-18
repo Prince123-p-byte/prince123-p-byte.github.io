@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Post</title>
+</head>
+<body>
+  <h1>Create a Post</h1>
+  <textarea id="postContent" placeholder="Write your post..." rows="5" cols="40"></textarea><br><br>
+  <button onclick="createPost()">Share</button>
+  <p id="shareLink"></p>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUK0HY6MAFMh_4QoinLFjyc91p2Ds65XA",
+      authDomain: "sharepostapp-b04c4.firebaseapp.com",
+      projectId: "sharepostapp-b04c4",
+      storageBucket: "sharepostapp-b04c4.firebasestorage.app",
+      messagingSenderId: "739870970679",
+      appId: "1:739870970679:web:3c877919d634b96e9740b2",
+      measurementId: "G-MBXY84LFNZ"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function createPost() {
+      const content = document.getElementById("postContent").value;
+      if (!content.trim()) return alert("Post cannot be empty!");
+
+      db.collection("posts").add({ content, createdAt: new Date() })
+        .then((docRef) => {
+          const link = `${location.origin}/post.html?id=${docRef.id}`;
+          document.getElementById("shareLink").innerHTML = `
+            Share this link:<br>
+            <a href="${link}" target="_blank">${link}</a>
+          `;
+        })
+        .catch((error) => {
+          alert("Error creating post: " + error.message);
+        });
+    }
+  </script>
+</body>
+</html>
